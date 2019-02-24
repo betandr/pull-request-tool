@@ -2,15 +2,13 @@
 
 [![Build Status](https://drone.andr.io/api/badges/betandr/pull-request-tool/status.svg)](https://drone.andr.io/betandr/pull-request-tool)
 
-_`prt` is a tool that allows you to list pull requests on GitHub
-from the command line._
+_`prt` is a tool that allows you to list pull requests on GitHub from the command line._
 
 *NB: PRT is not complete and is not ready to actually use yet! :)*
 
 ## Usage
 
-You'll need a GitHub access token from https://github.com/settings/tokens to use
-`prt`.
+You'll need a GitHub access token from https://github.com/settings/tokens to use `prt`.
 
 `export OAUTH_TOKEN={yourtokenhere}`
 
@@ -37,5 +35,5 @@ Merge:
 - Reply to Review
 - Resolve review
 
-_betandr/prt is licensed under the_
+_betandr/pull-request-tool is licensed under the_
 _*GNU Affero General Public License v3.0*_
