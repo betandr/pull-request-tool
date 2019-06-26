@@ -114,6 +114,8 @@ func renderPull(pr *github.PullRequest, extra bool) {
 			fmt.Println("")
 		}
 	}
+	
+	fmt.Println(pr.HTMLUrl)
 }
 
 func renderMergeStatus(status *github.MergeStatus) {
