@@ -40,8 +40,10 @@ func UpdatePullRequest(repo string, number int, title, body, state, base string)
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("Update PR %d commits from %s failed: %s", number, repo, res.Status)
+		return nil, fmt.Errorf("could not update PR %d from %s: %s", number, repo, msg.Message)
 	}
 
 	var pr *PullRequest
@@ -66,7 +68,7 @@ func MergePullRequest(repo string, number int, title, message, method string) (*
 	}
 
 	if len(method) > 0 {
-		reqURL = fmt.Sprintf("%s&method=%s", reqURL, method)
+		reqURL = fmt.Sprintf("%s&merge_method=%s", reqURL, method)
 	}
 
 	req, err := http.NewRequest("PUT", reqURL, nil)
@@ -84,8 +86,11 @@ func MergePullRequest(repo string, number int, title, message, method string) (*
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("List PR %d commits from %s failed: %s", number, repo, res.Status)
+
+		return nil, fmt.Errorf("could not merge PR %d to %s: %s", number, repo, msg.Message)
 	}
 
 	var status *MergeStatus
@@ -161,8 +166,10 @@ func ListPullRequestStatuses(reqURL string) ([]*Status, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("List PR statuses failed: %s", res.Status)
+		return nil, fmt.Errorf("listing PR statuses failed: %s", msg.Message)
 	}
 
 	var statuses []*Status
@@ -194,8 +201,10 @@ func ListPullRequestComments(repo string, number int) ([]*Comment, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("List PR %d commits from %s failed: %s", number, repo, res.Status)
+		return nil, fmt.Errorf("List PR %d commits from %s failed: %s", number, repo, msg.Message)
 	}
 
 	var comments []*Comment
@@ -227,8 +236,10 @@ func ListPullRequestCommits(repo string, number int) ([]*Commit, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("List PR %d commits from %s failed: %s", number, repo, res.Status)
+		return nil, fmt.Errorf("could not list PR %d commits from %s: %s", number, repo, msg.Message)
 	}
 
 	var commits []*Commit
@@ -260,8 +271,10 @@ func GetPullRequest(repo string, number int) (*PullRequest, error) {
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("Get PR %d from %s failed: %s", number, repo, res.Status)
+		return nil, fmt.Errorf("could not get PR %d from %s: %s", number, repo, msg.Message)
 	}
 
 	var result *PullRequest
@@ -298,8 +311,10 @@ func ListPullRequests(repo string, allIssues bool) (*PullRequestsResult, error) 
 	}
 
 	if res.StatusCode != http.StatusOK {
+		var msg *Response
+		json.NewDecoder(res.Body).Decode(&msg)
 		res.Body.Close()
-		return nil, fmt.Errorf("List PRs from %s failed: %s", repo, res.Status)
+		return nil, fmt.Errorf("could not list PRs from %s: %s", repo, msg.Message)
 	}
 
 	var pulls []*PullRequest

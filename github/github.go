@@ -95,6 +95,12 @@ type MergeStatus struct {
 	Message string `json:"message"`
 }
 
+// Response represents a response containing a message and documentation_url
+type Response struct {
+	Message          string `json:"message"`
+	DocumentationURL string `json:"documentation_url"`
+}
+
 // PullRequest represents a single pull request
 type PullRequest struct {
 	Number             int

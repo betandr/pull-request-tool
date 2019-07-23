@@ -126,36 +126,38 @@ func main() {
 	// This is a work in progress; it's not finished yet and pretty brittle! ;)
 
 	if len(os.Args) <= 1 {
-		fmt.Println("Usage: prt {list|get|create|delete} {owner/repo} {...}")
+		fmt.Println("usage: prt {list|get|create|delete} {owner/repo} {...}")
 		os.Exit(0)
 	}
 
 	if os.Args[1] == "help" {
-		fmt.Println("List:\tprt list owner/repo (optional: --all)")
-		fmt.Println("Get:\tprt get owner/repo {number}")
-		fmt.Println("Create:\tprt create owner/repo {branch} {base} {title}")
-		fmt.Println("Update:\tprt update owner/repo {number} {base} {title}")
-		fmt.Println("Merge:\tprt merge owner/repo {number} (optional: {title} {message} {method} (merge, squash or rebase))")
-		fmt.Println("Close:\tprt close owner/repo {number}")
+		fmt.Println("list:\tprt list owner/repo (optional: --all)")
+		fmt.Println("get:\tprt get owner/repo {number}")
+		fmt.Println("create:\tprt create owner/repo {branch} {base} {title}")
+		fmt.Println("update:\tprt update owner/repo {number} {base} {title}")
+		fmt.Println("merge:\tprt merge owner/repo {number} (optional: {title} {message} {method} (merge, squash or rebase))")
+		fmt.Println("close:\tprt close owner/repo {number}")
 		os.Exit(0)
 	}
 
 	if os.Args[1] == "update" {
 		number, err := strconv.Atoi(os.Args[3])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not update PR with number %s", os.Args[3])
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		pr, err := github.GetPullRequest(os.Args[2], number)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		filename := "4afc7c1fecb812c8cb140d072315a8a5"
 		writeErr := ioutil.WriteFile(filename, []byte(pr.Body), 0644)
 		if writeErr != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		cmd := exec.Command("vim", filename)
@@ -184,13 +186,14 @@ func main() {
 	} else if os.Args[1] == "close" {
 		number, err := strconv.Atoi(os.Args[3])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not update PR with number %s", os.Args[3])
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		pr, err := github.GetPullRequest(os.Args[2], number)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		updatedPr, err := github.UpdatePullRequest(
@@ -201,7 +204,8 @@ func main() {
 			"closed",
 			pr.Base.Ref)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		renderPull(updatedPr, true)
@@ -227,13 +231,14 @@ func main() {
 
 		number, err := strconv.Atoi(os.Args[3])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not merge PR with number %s", os.Args[3])
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		status, err := github.MergePullRequest(os.Args[2], number, title, message, method)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		renderMergeStatus(status)
@@ -252,7 +257,8 @@ func main() {
 
 		pr, err := github.CreatePullRequest(os.Args[2], os.Args[5], string(body), os.Args[3], os.Args[4])
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		renderPull(pr, false)
@@ -260,28 +266,32 @@ func main() {
 	} else if os.Args[1] == "get" {
 		number, err := strconv.Atoi(os.Args[3])
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Could not get PR with number %s from %s", os.Args[4], os.Args[3])
-			os.Exit(1)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		pr, err := github.GetPullRequest(os.Args[2], number)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		commits, err := github.ListPullRequestCommits(os.Args[2], number)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		comments, err := github.ListPullRequestComments(os.Args[2], number)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		statuses, err := github.ListPullRequestStatuses(pr.StatusesURL)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		renderPull(pr, true)
@@ -311,13 +321,14 @@ func main() {
 		}
 		result, err := github.ListPullRequests(os.Args[2], allIssues)
 		if err != nil {
-			log.Fatal(err)
+			fmt.Fprintf(os.Stderr, "%s\n", err)
+			os.Exit(0)
 		}
 
 		for _, pr := range result.PullRequests {
 			renderPull(pr, false)
 		}
 	} else {
-		fmt.Printf("Unknown command: %s\n", os.Args[1])
+		fmt.Printf("unknown command: %s\n", os.Args[1])
 	}
 }
